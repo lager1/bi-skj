@@ -337,8 +337,6 @@ function checkFiles()
 
   done
 
-
-
 # tady pridelat nejakou dalsi kontrolu neceho .. 
 # kontrola poctu zaznamu -> pokud mame vice souboru, tak nas zajima, zda kreslime do jednoho grafu vice krivek
   if [[ $# -gt 1 ]]
@@ -347,8 +345,6 @@ function checkFiles()
     local words=$(head -1 ${DATA[0]} | wc -w)
     local cols
     local ret
-    local t1
-    local t2
 
     for((j = 1; j < "$words"; j++))
     do
@@ -357,14 +353,10 @@ function checkFiles()
 
     cols=$(echo "${cols%,}")          # cut off the first , from the left
 
-    echo "words: $words"
-    echo "cols: $cols"
-
     for i in "${DATA[@]}"
     do
       [[ $(wc -l < "${DATA[0]}") -ne $(wc -l < "$i") ]] && { MULTIPLOT="false"; return; }
       
-
       # na toto se jeste poptat, zda je implicitne timeformat a hodnota oddelena mezerou
       # dale, muze byt vice hodnot pro jeden casovy udaj v jednom souboru ?
       
@@ -373,15 +365,12 @@ function checkFiles()
       ret=$(diff <(cat ${DATA[0]} | cut -d" " -f${cols}) <(cat $i | cut -d" " -f${cols}))
       #[[ $(diff <(cat ${DATA[0]} | cut -d" " -f${cols}) <(cat $i | cut -d" " -f${cols}) &>/dev/null) -ne 0 ]] && { echo "diff"; MULTIPLOT="false"; return; }
 
-      [[ "$ret" != "" ]] && { echo "diff"; MULTIPLOT="false"; return; }
-
+      [[ "$ret" != "" ]] && { MULTIPLOT="false"; return; }
 
     done
   fi
   
   MULTIPLOT="true"
-
-  echo "MULTIPLOT: $MULTIPLOT"
 
 }
 
@@ -419,6 +408,8 @@ function checkFiles()
 #-------------------------------------------------------------------------------
 function checkSwitch()
 {
+  #echo "kontrola parametru $1"
+
   for i in ${SWITCHES[@]}
   do
     [[ $i == $1 ]] && return 1;
@@ -439,15 +430,20 @@ function checkSwitch()
 #-------------------------------------------------------------------------------
 function readConfig()
 {
+
+  echo "cteme konfig"
+
+  [[ "${CONFIG["f"]}" != "" ]] || return;        # configuration file was not provided
+
+
   # indexace pomocneho pole
   switches_idx=${#SWITCHES[@]}	# delka pole, budeme zapisovat dal
   #X=${#SWITCHES[@]}	# promenna pro kontrolu, zda vubec konfiraguracni soubor neco obsahuje
   # ve vysledku mozna nebude treba?
 
+
   # TIMEFORM
-  #if [[ checkSwitch t -eq 0 ]]	# zkoumame, zda jsme prepinac zpracovali
-  #if [[ checkSwitch -eq 0 ]]	# zkoumame, zda jsme prepinac zpracovali
-  if [[ "$(checkSwitch) t" -eq 0 ]]	# zkoumame, zda jsme prepinac zpracovali
+  if [[ "$(checkSwitch t)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
   then
 
     echo "hm"
@@ -460,7 +456,7 @@ function readConfig()
 
   # YMAX
   # jedna hodnota ~ jedno slovo
-  if checkSwitch Y # zkoumame, zda jsme prepinac zpracovali
+  if [[ "$(checkSwitch Y)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Ymax/' | wc -l` -gt 1 ] && 
     { echo "direktiva Ymax je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -480,7 +476,7 @@ function readConfig()
 
   # YMIN
   # jedna hodnota ~ jedno slovo
-  if checkSwitch y # zkoumame, zda jsme prepinac zpracovali
+  if [[ "$(checkSwitch y)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Ymin/' | wc -l` -gt 1 ] && 
     { echo "direktiva Ymin je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -500,7 +496,7 @@ function readConfig()
 
   # SPEED
   # jedna hodnota ~ jedno slovo
-  if checkSwitch S # zkoumame, zda jsme prepinac zpracovali
+  if [[ "$(checkSwitch S)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Speed/' | wc -l` -gt 1 ] && 
     { echo "direktiva Speed je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -520,7 +516,7 @@ function readConfig()
 
   # DURATION
   # jedna hodnota ~ jedno slovo
-  if checkSwitch T # zkoumame, zda jsme prepinac zpracovali
+  if [[ "$(checkSwitch T)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Time /' | wc -l` -gt 1 ] && 
     { echo "direktiva Time je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -542,7 +538,7 @@ function readConfig()
 
   # FPS
   # jedna hodnota ~ jedno slovo
-  if checkSwitch F # zkoumame, zda jsme prepinac zpracovali
+  if [[ "$(checkSwitch F)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /FPS/' | wc -l` -gt 1 ] && 
     { echo "direktiva FPS je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -603,7 +599,7 @@ function readConfig()
   fi
 
   # GNUPLOTPARAMS
-  if checkSwitch g # zkoumame, zda jsme prepinac zpracovali
+  if [[ "$(checkSwitch g)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
   then  # direktiva muze byt uvedene nekolikrat, kontrola neni potreba
     CNT=`cat $1 | grep ^[a-Z] | grep "GnuplotParams" | wc -l`
     B=0
@@ -621,7 +617,7 @@ function readConfig()
   fi
 
   # LEGEND
-  if checkSwitch l # zkoumame, zda jsme prepinac zpracovali
+  if [[ "$(checkSwitch l)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Legend/' | wc -l` -gt 1 ] && 
     { echo "direktiva Legend je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -635,7 +631,7 @@ function readConfig()
   fi
 
   # NAME
-  if checkSwitch n # zkoumame, zda jsme prepinac zpracovali
+  if [[ "$(checkSwitch n)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Name/' | wc -l` -gt 1 ] && 
     { echo "direktiva Legend je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -705,13 +701,12 @@ function readConfig()
     verbose "value of the switch -$i ${CONFIG["$i"]}" # report values of all entered switches
   done
 
-  # tuhle podminku dat mozna primo do samotne funkce ?
-  [[ "${CONFIG["f"]}" != "" ]] && readConfig "${CONFIG["f"]}"   # read the configuration file
+  readConfig "${CONFIG["f"]}"   # read the configuration file
 
   checkFiles "$@"           # check the data files at this point, so its not necessary later - possible errors are solved close to the start
   verbose "data files ${DATA[@]}"   # report data files
 
 
-
+  # pouze debug
   echo "MULTIPLOT: $MULTIPLOT"
 
