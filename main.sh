@@ -372,6 +372,10 @@ function checkFiles()
   
   MULTIPLOT="true"
 
+
+
+  # tady jeste ty soubory seradit ve spravnem poradi dle casu, pokud na sebe nenavazuji ?
+
 }
 
 
@@ -408,14 +412,25 @@ function checkFiles()
 #-------------------------------------------------------------------------------
 function checkSwitch()
 {
-  #echo "kontrola parametru $1"
+#  echo "kontrola parametru $1"
 
   for i in ${SWITCHES[@]}
   do
-    [[ $i == $1 ]] && return 1;
+#    echo "i: $i"
+
+    #[[ "$i" == "$1" ]] && return 1;
+    #[[ $i == $1 ]] && return "1";
+    [[ $i == $1 ]] && exit 1
   done
-  return 0;
+  #return 0;
+  return 0
+  #exit 0;
+  #exit 0
 }
+
+
+# funkce checkSwitch neni ve vysledku potreba, pokud neprijdu na to, jak ji volat v podmince a zaroven dostat navratovou hodnotu
+
 
 
 #-------------------------------------------------------------------------------
@@ -425,14 +440,11 @@ function checkSwitch()
 # the result of the processing is saved in the global variables
 # when an error occurs it is sent to the error function
 
-# je dovolen prazdny(neobsahujici zadne direktivi) konfiguracni soubor?
+# je dovolen prazdny(neobsahujici zadne direktivy) konfiguracni soubor?
 
 #-------------------------------------------------------------------------------
 function readConfig()
 {
-
-  echo "cteme konfig"
-
   [[ "${CONFIG["f"]}" != "" ]] || return;        # configuration file was not provided
 
 
@@ -442,21 +454,37 @@ function readConfig()
   # ve vysledku mozna nebude treba?
 
 
-  # TIMEFORM
-  if [[ "$(checkSwitch t)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
+#
+#
+#
+#       JESTE KONTROLA, ZDA CTEME VSECHNY DEFINOVANE DIREKTIVY - PREPINACE
+#
+
+
+  if ! [[ "${SWITCHES[@]}" =~ t ]]	# zkoumame, zda jsme prepinac zpracovali
   then
 
     echo "hm"
+    # znak # predstavuje komentar az do konce radku
+    # prazdne radky jsou nevyznamne, stejne tak jako radky obsahujici pouze mezery a taby
+    
+    
+    sed -n '/^[^#]*TimeFormat/Ip' "$1"
+
+
+
+
 
   #  [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /TimeFormat/' | wc -l` -gt 1 ] && 
   #  { echo "direktiva TimeFormat je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
   #	TMP=`cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /TimeFormat/' | sed 's/TimeFormat //'`
   #	! [[ $TMP =~ ^$ ]] && TIMEFORM=$TMP	# ok, direktiva je evedena
   fi
+  
 
   # YMAX
   # jedna hodnota ~ jedno slovo
-  if [[ "$(checkSwitch Y)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
+  if ! [[ "${SWITCHES[@]}" =~ Y ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Ymax/' | wc -l` -gt 1 ] && 
     { echo "direktiva Ymax je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -476,7 +504,7 @@ function readConfig()
 
   # YMIN
   # jedna hodnota ~ jedno slovo
-  if [[ "$(checkSwitch y)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
+  if ! [[ "${SWITCHES[@]}" =~ y ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Ymin/' | wc -l` -gt 1 ] && 
     { echo "direktiva Ymin je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -496,7 +524,7 @@ function readConfig()
 
   # SPEED
   # jedna hodnota ~ jedno slovo
-  if [[ "$(checkSwitch S)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
+  if ! [[ "${SWITCHES[@]}" =~ S ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Speed/' | wc -l` -gt 1 ] && 
     { echo "direktiva Speed je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -516,7 +544,7 @@ function readConfig()
 
   # DURATION
   # jedna hodnota ~ jedno slovo
-  if [[ "$(checkSwitch T)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
+  if ! [[ "${SWITCHES[@]}" =~ T ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Time /' | wc -l` -gt 1 ] && 
     { echo "direktiva Time je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -538,7 +566,7 @@ function readConfig()
 
   # FPS
   # jedna hodnota ~ jedno slovo
-  if [[ "$(checkSwitch F)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
+  if ! [[ "${SWITCHES[@]}" =~ F ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /FPS/' | wc -l` -gt 1 ] && 
     { echo "direktiva FPS je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -591,7 +619,7 @@ function readConfig()
   then
 	if ! [[ "$TMP" == "true" || "$TMP" == "false" ]]		# ma spatny format
 	then
-	  echo "spatny format direktivy EffectParams v zadanem konfiguracnim souboru"
+	  echo "spatny format direktivy IgnoreErrors v zadanem konfiguracnim souboru"
 	  echo "direktiva pripousti pouze hodnoty true, false"
 	  exit 1;
 	fi
@@ -599,7 +627,7 @@ function readConfig()
   fi
 
   # GNUPLOTPARAMS
-  if [[ "$(checkSwitch g)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
+  if ! [[ "${SWITCHES[@]}" =~ g ]]	# zkoumame, zda jsme prepinac zpracovali
   then  # direktiva muze byt uvedene nekolikrat, kontrola neni potreba
     CNT=`cat $1 | grep ^[a-Z] | grep "GnuplotParams" | wc -l`
     B=0
@@ -617,7 +645,7 @@ function readConfig()
   fi
 
   # LEGEND
-  if [[ "$(checkSwitch l)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
+  if ! [[ "${SWITCHES[@]}" =~ l ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Legend/' | wc -l` -gt 1 ] && 
     { echo "direktiva Legend je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
@@ -631,7 +659,7 @@ function readConfig()
   fi
 
   # NAME
-  if [[ "$(checkSwitch n)" == "0" ]]	# zkoumame, zda jsme prepinac zpracovali
+  if ! [[ "${SWITCHES[@]}" =~ n ]]	# zkoumame, zda jsme prepinac zpracovali
   then
     [ `cat $1 | grep ^[a-Z] | awk 'BEGIN{IGNORECASE=1} /Name/' | wc -l` -gt 1 ] && 
     { echo "direktiva Legend je v zadanem konfiguracnim souboru $CONFIG uvedena vicekrat"; exit 1; }    # direktiva je v souboru uvedena vice nez jednou
