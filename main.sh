@@ -216,7 +216,7 @@ function readParams()
 
          if ! [[ "$OPTARG" == "auto" || "$OPTARG" == "max" ]] # none of acceptable text values
          then
-           # there may be specific value, need to be checked
+           # there may be specific value, needs to be checked
 
            [[ "$(echo "$OPTARG" | grep [0-9])" == "" ]] && {  # just some text
              error "wrong argument of the switch -X"; }
@@ -239,7 +239,7 @@ function readParams()
 
          if ! [[ "$OPTARG" == "auto" || "$OPTARG" == "min" ]] # none of acceptable text values
          then
-           # there may be specific value, need to be checked
+           # there may be specific value, needs to be checked
 
            [[ "$(echo "$OPTARG" | grep [0-9])" == "" ]] && {  # just some text
              error "wrong argument of the switch -x"; }
@@ -291,45 +291,13 @@ function readParams()
       c) # CRITICALVALUE
 		 [ -z "$OPTARG" ] && error "the value of the switch -c was not provided"
          
-         # kontrola hodnoty
-         # pozor na + a -
-
-         # muze byt napriklad takto: -c x=09/04/01 -c x=09/09/01 -c y=500:y=590:y=600:x=09/07/01
-         # 
-         #
-         #
-         #
-
-
-         #! [[ "$OPTARG" =~ ^y=\+?[0-9]+$  || "$OPTARG" =~ ^y=\+?[0-9]+\.[0-9]+$ || "$OPTARG" =~ ^y=-?[0-9]+$ || "$OPTARG" =~ ^y=-?[0-9]+\.[0-9]+$ ]] && error "wrong argument of the switch -c"
-
-         #for i in "$OPTARG" 
-         #for i in echo "$OPTARG | tr ":" " ""
-         #for i in echo "$OPTARG" | tr ":" " "
-
-
-         #set -v
-         #set -x
-
-         #for i in $("$OPTARG" | tr ":" " ")
-         #for i in $(echo "$OPTARG" | tr ":" " ")
-
-
-         ! [[ "${SWITCHES[@]}" =~ c ]] &&	# check if this particular switch was processed on the command line, do not save duplicit values
-           SWITCHES[$((switches_idx++))]="c"	# save the processed switch
-
-
          for i in $(echo "$OPTARG" | tr ":" " ")
          do
 
            # check both x and y, x values are in format defined by Timeformat
            ! [[ "$i" =~ ^y=\+?[0-9]+$  || "$i" =~ ^y=\+?[0-9]+\.[0-9]+$ || "$i" =~ ^y=-?[0-9]+$ || "$i" =~ ^y=-?[0-9]+\.[0-9]+$ || "$i" =~ ^x="$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$i" | sed 's/x=//; s/[^0-9]//g')")"$ ]] && error "wrong argument of the switch -c"
 
-
-
-           #CRITICALVALUES[$((crit_val_idx++))]="$OPTARG" # save the argument of the switch
            CRITICALVALUES[$((crit_val_idx++))]="$i" # save the argument of the switch
-
 
            if [[ "${CONFIG["c"]}" == "" ]]
            then
@@ -338,24 +306,10 @@ function readParams()
              CONFIG["c"]="${CONFIG["c"]} $i"              # save the argument of the switch, this way it can be displayed by verbose
            fi
 
-        
          done
-
-         set +v
-         set +x
-
-
-         # debug
-         #exit 1
-
-         # check both x and y, x values are in format defined by Timeformat
-         #! [[ "$OPTARG" =~ ^y=\+?[0-9]+$  || "$OPTARG" =~ ^y=\+?[0-9]+\.[0-9]+$ || "$OPTARG" =~ ^y=-?[0-9]+$ || "$OPTARG" =~ ^y=-?[0-9]+\.[0-9]+$ || "$OPTARG" =~ ^x="$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$OPTARG" | sed 's/x=//; s/[^0-9]//g')")"$ ]] && error "wrong argument of the switch -c"
-
-
-         #CRITICALVALUES[$((crit_val_idx++))]="$OPTARG" # save the argument of the switch
          
-
-         ;;
+         ! [[ "${SWITCHES[@]}" =~ c ]] &&	# check if this particular switch was processed on the command line, do not save duplicit values
+           SWITCHES[$((switches_idx++))]="c";;	# save the processed switch
 
       l) # LEGEND		 
 		 [ -z "$OPTARG" ] && error "the value of the switch -l was not provided"
@@ -369,8 +323,6 @@ function readParams()
    
    
    # tady jeste upravit podle efektu !!
-
-      
       e) # EFFECTPARAMS
 		 [ -z "$OPTARG" ] && error "the value of the switch -e was not provided"
 		 OPTARG=`echo "$OPTARG" | tr ":" " "`	# change the seperator to space so we could iterate
@@ -543,11 +495,6 @@ function readConfig()
 #       JESTE KONTROLA, ZDA CTEME VSECHNY V ZADANI DEFINOVANE DIREKTIVY - PREPINACE
 #
 
-
-    # PROBLEM V CELE FUNKCI -> JE TREBA KOUKAT, ZDA TAM DIREKTIVA JE A ZDA MA NEJAKOU HODNOTU
-    # SOUCASNA IMPLEMENTACE NEODHALI CHYBI, KDY JE DIREKTIVA UVEDENA BEZ HODNOTY !!!!!
-
-
   local ret             # for checking values of the directives
   local directives=0    # number of processed directives
 
@@ -589,7 +536,7 @@ function readConfig()
 
     if ! [[ "$ret" == "auto" || "$ret" == "max" ]] # none of acceptable text values
     then
-      # there may be specific value, need to be checked
+      # there may be specific value, needs to be checked
 
       [[ "$(echo "$ret" | grep [0-9])" == "" ]] && {  # just some text
         error "wrong argument of the Xmax directive"; }
@@ -598,7 +545,6 @@ function readConfig()
       [[ "$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$ret" | sed 's/[^0-9]//g')")" == "$ret" ]] || error "provided timestamp format and argument of the Xmax directive in the configuration file \"$1\" does not match"
     fi
     
-    # zde uz je vstup overen
     CONFIG["X"]="$ret"
     ((directives++))
     verbose "value of the Xmax directive: $ret"
@@ -614,7 +560,7 @@ function readConfig()
 
     if ! [[ "$ret" == "auto" || "$ret" == "min" ]] # none of acceptable text values
     then
-      # there may be specific value, need to be checked
+      # there may be specific value, needs to be checked
 
       [[ "$(echo "$ret" | grep [0-9])" == "" ]] && {  # just some text
         error "wrong argument of the Xmin directive"; }
@@ -623,7 +569,6 @@ function readConfig()
       [[ "$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$ret" | sed 's/[^0-9]//g')")" == "$ret" ]] || error "provided timestamp format and argument of the Xmin directive in the configuration file \"$1\" does not match"
     fi
     
-    # zde uz je vstup overen
     CONFIG["x"]="$ret"
     ((directives++))
     verbose "value of the Xmin directive: $ret"
@@ -740,19 +685,6 @@ function readConfig()
     
     [[ "$ret" == "" ]] && error "value of the GnuplotParams directive was not provided in the configuration file \"$1\""
 
-#    CNT=`cat $1 | grep ^[a-Z] | grep "GnuplotParams" | wc -l`
-#    B=0
-#    for ((i=1; i<=$CNT; i++))
-#    do
-#      VAL=`cat $1 | grep ^[a-Z] | grep "GnuplotParams" | sed 's/ *#.*// ; s/GnuplotParams //' | awk '{if(NR=='$i') print }'`
-#      GNUPLOTPARAMS[$B]=$VAL
-#	  ((B++))
-#    done
-#	[ $CNT -gt 1 ] && { 
-#	  # direktiva je v souboru uvedena alespon 1x
-#	  SWITCHES[$switches_idx]="g";	# zapamutujeme si zpracovanou direktivu pro kontrolu, zda byla zadana hodnota
-#	  ((switches_idx++));
-#	}
   fi
 
   # ==================================
