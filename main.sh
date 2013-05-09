@@ -745,7 +745,18 @@ function createAnim()
   then
     for i in ${CRITICALVALUES[@]}
     do
-      plot="$plot "$(echo $i | sed 's/x=//; s/y=//')","
+      if [[ "$(echo "$i" | sed 's/y=//; s/x=//')" =~ ^-?[0-9]+$ || "$i" =~ ^-?[0-9]+\.[0-9]+$ || "$i" =~ ^\+?[0-9]+$ || "$i" =~ ^\+?[0-9]+\.[0-9]+$ ]] # y value
+      then
+        plot="$plot "$(echo $i | sed 's/y=//')","
+
+      else      # x value
+
+#    set arrow from "19:03:05",graph(0,0) to "19:03:05",graph(1,1) nohead
+
+        #plot="$plot \""$(echo $i | sed 's/x=//')"\","
+        #plot="$plot const,t,"
+        gnuplot="$gnuplot set arrow from \""$(echo "$i" | sed 's/x=//')"\",graph(0,0) to \""$(echo "$i" | sed 's/x=//')"\",graph(1,1) nohead; "
+      fi
     done
   fi
 
@@ -755,9 +766,7 @@ function createAnim()
   #fi
 
 
-  # debug
-  echo "plot: $plot"
-  exit 0
+
 
 
 #-------------------------------------------------------------------------------
@@ -837,6 +846,15 @@ function createAnim()
 
   fi
 
+
+
+  # debug
+  #echo "plot: $plot"
+  #echo "gnuplot: $gnuplot"
+  #exit 0
+
+
+
 #  echo "pocet snimku je $frames"
 #  echo "fps je: $fps"
   
@@ -850,12 +868,7 @@ function createAnim()
 
     # pridani kritickych hodnot
 
-    echo "$gnuplot; set output '$directory/$(printf %0${#records}d $j).png'; plot $plot '<head -$i $directory/data' using 1:2 with boxes smooth unique;" | gnuplot
-
-    #echo "set terminal png size 1024,768; set font 'verdana'; set output '$directory/$(printf %0${#records}d $j).png'; set timefmt '${CONFIG["t"]}'; set xdata time; set format x '${CONFIG["t"]}'; set xlabel 'Time'; set ylabel 'Value'; set nokey; set ${GNUPLOTPARAMS[@]}; plot '<head -$i $directory/data' using 1:2 with boxes smooth unique;" | gnuplot
-    
-    
-#echo "set terminal png size 1024,768; set font 'verdana'; set output '$directory/$(printf %0${#records}d $j).png'; set timefmt '${CONFIG["t"]}'; set xdata time; set format x '${CONFIG["t"]}'; set xlabel 'Time'; set ylabel 'Value'; set y2label 'Value'; set nokey; plot '<head -$i $directory/data' using 1:2 with boxes smooth unique;" | gnuplot
+    echo "$gnuplot; set output '$directory/$(printf %0${#records}d $j).png'; plot $plot '<head -$i $directory/data' using 1:2 with lines smooth unique;" | gnuplot #&>/dev/null
     
     ((j++))
 
