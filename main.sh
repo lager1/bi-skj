@@ -115,13 +115,7 @@ function readParams()
 
            # there may be specific value, needs to be checked
            # first check if the format of the argument is correct, then check by date
-           [[ "$OPTARG" =~ ^$(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g;')$ ]] || error "provided timestamp format and argument of the switch -X does not match"
-
-           local ret="$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$OPTARG")" 2>&1)"     # vystup zpracovani
-           [[ "$ret" != "$OPTARG" ]] && error "error while converting timestamp to provided value \'$OPTARG\', details:\n $ret"
-
-           # first print the timestamp, then process by date with the argument of the switch -X
-           [[ "$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$OPTARG")" 2> /dev/null)" == "$OPTARG" ]] || error "provided timestamp format and argument of the switch -X does not match"
+           [[ "$OPTARG" =~ ^$(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g; s/./\\./g; s/[/\\[/g; s/]/\\]/g; s/\\/\\\\/g;')$ ]] || error "provided timestamp format and argument of the switch -X does not match"
 
          fi
 
@@ -135,13 +129,7 @@ function readParams()
          then
            # there may be specific value, needs to be checked
            # first check if the format of the argument is correct, then check by date
-           [[ "$OPTARG" =~ ^$(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g;')$ ]] || error "provided timestamp format and argument of the switch -x does not match"
-
-           local ret="$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$OPTARG")" 2>&1)"     # vystup zpracovani
-           [[ "$ret" != "$OPTARG" ]] && error "error while converting timestamp to provided value \'$OPTARG\', details:\n $ret"
-
-           # first print the timestamp, then process by date with the argument of the switch -x
-           [[ "$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$OPTARG")" 2> /dev/null)" == "$OPTARG" ]] || error "provided timestamp format and argument of the switch -x does not match"
+           [[ "$OPTARG" =~ ^$(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g; s/./\\./g; s/[/\\[/g; s/]/\\]/g; s/\\/\\\\/g;')$ ]] || error "provided timestamp format and argument of the switch -x does not match"
 
          fi
 
@@ -319,7 +307,8 @@ function checkFiles()
   local words=$(head -1 ${DATA[0]} | wc -w)
 
   # check if the provided TimeFormat is equal with the timestamp in the data file
-  [[ "$(cat "${DATA[0]}" | cut -d " " -f1-$((words -1)) | tr "\n" " ")" =~ ^($(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g;') )+$ ]] || error "provided TimeFormat and timestamp in data file \"${DATA[0]}\" does not match"
+
+  [[ "$(cat "${DATA[0]}" | cut -d " " -f1-$((words -1)) | tr "\n" " ")" =~ ^($(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g; s/./\\./g; s/[/\\[/g; s/]/\\]/g; s/\\/\\\\/g;') )+$ ]] || error "provided TimeFormat and timestamp in data file \"${DATA[0]}\" does not match"
 
   # cant check specific dates with only regex, but should be enough
 
@@ -332,7 +321,7 @@ function checkFiles()
     do
       [[ $(wc -l < "${DATA[0]}") -ne $(wc -l < "$i") ]] && { MULTIPLOT="false"; return; }
 
-      [[ "$(cat "$i" | cut -d " " -f1-$((words -1)) | tr "\n" " ")" =~ ^($(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g;') )+$ ]] || error "provided TimeFormat and timestamp in data file \"$i\" does not match"  
+      [[ "$(cat "$i" | cut -d " " -f1-$((words -1)) | tr "\n" " ")" =~ ^($(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g; s/./\\./g; s/[/\\[/g; s/]/\\]/g; s/\\/\\\\/g;') )+$ ]] || error "provided TimeFormat and timestamp in data file \"$i\" does not match"  
       
       ret=$(diff <(cat ${DATA[0]} | cut -d" " -f1-$((words - 1))) <(cat $i | cut -d" " -f1-$((words - 1))))
       [[ "$ret" != "" ]] && { MULTIPLOT="false"; return; }  # timestamps in data files does not match each other
@@ -388,13 +377,7 @@ function readConfig()
       # there may be specific value, needs to be checked
       # first check if the format of the argument is correct, then check by date
 
-      [[ "$ret" =~ ^$(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g;')$ ]] || error "provided timestamp format and argument of the Xmax directive in the configuration file \"$1\" does not match"
-      
-      local return="$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$ret")" 2>&1)" 
-      [[ "$return" != "$ret" ]] && error "error while converting timestamp to provided value \'$ret\' in configuration file \"$1\", details:\n $return"
-
-      # first print the timestamp, then process by date with the argument of the switch -X
-      [[ "$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$ret")" 2> /dev/null)" == "$ret" ]] || error "provided timestamp format and argument of the Xmax directive in the configuration file \"$1\" does not match"
+      [[ "$ret" =~ ^$(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g; s/./\\./g; s/[/\\[/g; s/]/\\]/g; s/\\/\\\\/g;')$ ]] || error "provided timestamp format and argument of the Xmax directive in the configuration file \"$1\" does not match"
 
     fi
     
@@ -415,13 +398,7 @@ function readConfig()
     then
       # there may be specific value, needs to be checked
       # first check if the format of the argument is correct, then check by date
-      [[ "$ret" =~ ^$(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g;')$ ]] || error "provided timestamp format and argument of the Xmin directive in the configuration file \"$1\" does not match"
-
-      local return="$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$ret")" 2>&1)" 
-      [[ "$return" != "$ret" ]] && error "error while converting timestamp to provided value \'$ret\' in configuration file \"$1\", details:\n $return"
-
-      # first print the timestamp, then process by date with the argument of the switch -X
-      [[ "$(date "+$(printf "%s" "${CONFIG["t"]}")" -d "$(echo "$ret")" 2> /dev/null)" == "$ret" ]] || error "provided timestamp format and argument of the Xmin directive in the configuration file \"$1\" does not match"
+      [[ "$ret" =~ ^$(echo "${CONFIG["t"]}" | sed 's/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g; s/./\\./g; s/[/\\[/g; s/]/\\]/g; s/\\/\\\\/g;')$ ]] || error "provided timestamp format and argument of the Xmin directive in the configuration file \"$1\" does not match"
 
     fi
     
@@ -765,6 +742,12 @@ function createAnim()
   fi
 
 #-------------------------------------------------------------------------------
+  if [[ "${CONFIG["l"]}" != "" ]]           # legend
+    then
+    gnuplot="$gnuplot ${CONFIG["l"]}; "
+  fi
+
+#-------------------------------------------------------------------------------
 
   if [[ "${GNUPLOTPARAMS[@]}" != "" ]]      # other gnuplot parameters
   then
@@ -848,17 +831,15 @@ function createAnim()
     # fps = frames / time
     frames=$((records / ${CONFIG["S"]}))
     fps=$(($frames / ${CONFIG["T"]}))
-  fi
 
 
-  if [[ "${SWITCHES[@]}" =~ S && "${SWITCHES[@]}" =~ F ]] # Speed and FPS
+  elif [[ "${SWITCHES[@]}" =~ S && "${SWITCHES[@]}" =~ F ]] # Speed and FPS
   then
     fps="${CONFIG["F"]}"
     # time is set by these two values
-  fi
 
 
-  if [[ "${SWITCHES[@]}" =~ T && "${SWITCHES[@]}" =~ F ]] # Time and FPS
+  elif [[ "${SWITCHES[@]}" =~ T && "${SWITCHES[@]}" =~ F ]] # Time and FPS
   then
     fps="${CONFIG["F"]}"
     # calculate speed
@@ -911,8 +892,11 @@ function play()
 #-------------------------------------------------------------------------------
 function cleanup()
 {
-  find "${CONFIG["n"]}" -maxdepth 1 -name '*.png' -exec rm {} \;
-  find "${CONFIG["n"]}" -maxdepth 1 -name 'data' -exec rm {} \;
+  if [[ -d "$CONFIG["n"]" ]]
+  then
+    find "${CONFIG["n"]}" -maxdepth 1 -name '*.png' -exec rm {} \;
+    find "${CONFIG["n"]}" -maxdepth 1 -name 'data' -exec rm {} \;
+  fi
 }
 #-------------------------------------------------------------------------------
 # signal reactions
