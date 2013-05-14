@@ -176,8 +176,16 @@ function readParams()
          for i in $(echo "$OPTARG" | sed 's/:x=/ x=/g; s/:y=/ y=/g')
          do
 
-           # check both x and y, x values are in format defined by Timeformat
-           ! [[ "$i" =~ ^y=\+?[0-9]+$  || "$i" =~ ^y=\+?[0-9]+\.[0-9]+$ || "$i" =~ ^y=-?[0-9]+$ || "$i" =~ ^y=-?[0-9]+\.[0-9]+$ || "$i" =~ ^x="$(echo "${CONFIG["t"]}" | sed 's/\\/\\\\/g; s/\./\\./g; s/\[/\\[/g; s/\]/\\]/g; s/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g;')$" ]] && error "wrong argument of the switch -c"
+           if [[ "$i" =~ x= ]]  # check x, x values are in format defined by Timeformat
+           then
+             tmp="$(echo "${CONFIG["t"]}" | sed 's/\\/\\\\/g; s/\./\\./g; s/\[/\\[/g; s/\]/\\]/g; s/%d/(0\[1-9\]|\[1-2\]\[0-9\]|3\[0-1\])/g; s/%H/(\[0-1\]\[0-9\]|2\[0-3\])/g; s/%I/(0\[1-9\]|1\[0-2\])/g; s/%j/(00\[1-9\]|0\[0-9\]\[0-9\]|\[1-2\]\[0-9\]\[0-9\]|3\[0-5\]\[0-9\]|36\[0-6\])/g; s/%k/(\[0-9\]|1\[0-9\]|2\[0-3\])/g; s/%l/(\[0-9\]|1\[0-2\])/g; s/%m/(0\[1-9\]|1\[0-2\])/g; s/%M/(\[0-5\]\[0-9\]|60)/g; s/%S/(\[0-5\]\[0-9\]|60)/g; s/%u/\[1-7\]/g; s/%U/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%V/(0\[1-9\]|\[1-4\]\[0-9\]|5\[0-3\])/g; s/%w/\[0-6\]/g; s/%W/(\[0-4\]\[0-9\]|5\[0-3\])/g; s/%y/\[0-9\]\[0-9\]/g; s/%Y/(\[0-1\]\[0-9\]\[0-9\]\[0-9\]|200\[0-9\]|201\[0-3\])/g;')$"
+
+             [[ "$i" =~ ^x=$tmp$ ]] || error "wrong argument of the switch -c"
+
+           else
+             # check y
+             ! [[ "$i" =~ ^y=\+?[0-9]+$  || "$i" =~ ^y=\+?[0-9]+\.[0-9]+$ || "$i" =~ ^y=-?[0-9]+$ || "$i" =~ ^y=-?[0-9]+\.[0-9]+$ ]] && error "wrong argument of the switch -c"
+           fi
 
            CRITICALVALUES[$((crit_val_idx++))]="$i" # save the argument of the switch
 
@@ -802,6 +810,11 @@ function createAnim()
     gnuplot="$gnuplot set yrange[:$YMAX]; "
   fi
 
+  if [[ "${CONFIG["y"]}" == "min" && "${CONFIG["Y"]}" == "auto" ]]    # min + auto
+  then
+    gnuplot="$gnuplot set yrange[$YMIN:]; "
+  fi
+
 #-------------------------------------------------------------------------------
   # setting X values
 
@@ -824,8 +837,6 @@ function createAnim()
   then
     gnuplot="$gnuplot set xrange[\""$(sort -n "$directory/data" | head -1 | awk -v len=$time_len 'BEGIN { ORS=" " } { for(i = 1; i < len; i++ ) print $i }' | sed 's/ $//')"\":\"${CONFIG["X"]}\"]; "
   fi
-
-  # values for "auto" on y axis do not need to be set
 
 #-------------------------------------------------------------------------------
 
@@ -855,49 +866,73 @@ function createAnim()
     fps="${CONFIG["F"]}"
     # calculate speed
     CONFIG["S"]="$(echo "($records / ${CONFIG["F"]}) / ${CONFIG["T"]}")"
+
+
+  elif [[ "${SWITCHES[@]}" =~ T ]] # only Time 
+  then
+    fps="${CONFIG["F"]}"
+    CONFIG["S"]="$(echo "($records / ${CONFIG["F"]}) / ${CONFIG["T"]}")"
+
+  elif [[ "${SWITCHES[@]}" =~ S ]] # only Speed
+  then
+    fps="${CONFIG["F"]}"
+
+  elif [[ "${SWITCHES[@]}" =~ F ]] # only FPS
+  then
+    fps="${CONFIG["F"]}"
+
+  else      # nothing
+    fps="${CONFIG["F"]}"
+
   fi
 
 #-------------------------------------------------------------------------------
 
   # just generate output for gnuplot
   local j=0
-
   for((i = ${CONFIG["S"]}; i <= ${CONFIG["S"]}; i += ${CONFIG["S"]}))
   do
 
-    columns=$((columns - 2))
-    for((k = 0; k <= $columns; k++))
-    do
-      # red, green, blue, yellow, black
-      if ! [[ "$using" =~ red ]]
-      then
-        using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines linecolor rgb \"red\" smooth unique; "
+    if [[ $MULTIPLOT == "true" ]]
+    then
 
-      elif ! [[ "$using" =~ green ]]
-      then
-        using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines linecolor rgb \"green\" smooth unique; "
+      columns=$((columns - 2))
+      for((k = 0; k <= $columns; k++))
+      do
+        # red, green, blue, yellow, black
+        if ! [[ "$using" =~ red ]]
+        then
+          using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines linecolor rgb \"red\" smooth unique; "
 
-      elif ! [[ "$using" =~ blue ]]
-      then
-        using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines linecolor rgb \"blue\" smooth unique; "
+        elif ! [[ "$using" =~ green ]]
+        then
+          using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines linecolor rgb \"green\" smooth unique; "
 
-      elif ! [[ "$using" =~ yellow ]]
-      then
-        using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines linecolor rgb \"yellow\" smooth unique; "
+        elif ! [[ "$using" =~ blue ]]
+        then
+          using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines linecolor rgb \"blue\" smooth unique; "
 
-      elif ! [[ "$using" =~ black ]]
-      then
-        using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines linecolor rgb \"black\" smooth unique; "
+        elif ! [[ "$using" =~ yellow ]]
+        then
+          using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines linecolor rgb \"yellow\" smooth unique; "
 
-      else
-        using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines smooth unique; "
+        elif ! [[ "$using" =~ black ]]
+        then
+          using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines linecolor rgb \"black\" smooth unique; "
 
-      fi
-    done
+        else
+          using="$using plot '<head -$i $directory/data' using 1:$((k + 2)) with lines smooth unique; "
+
+        fi
+      done
+
+    else
+      using="$using plot '<head -$i $directory/data' using 1:$columns with lines smooth unique; "
+    fi
 
     if [[ "$plot" != "" ]]
     then
-      output="$gnuplot; plot $plot; $using"
+      output="$gnuplot; plot ${plot:0:$((${#plot} -1))}; $using"    # cut off last ','
     else
       output="$gnuplot; $using"
     fi
@@ -906,15 +941,7 @@ function createAnim()
 
 #-------------------------------------------------------------------------------
 
-# potencialni efekt -> reverse
-# 
-#    echo "set output '$directory/$(printf %0${#records}d $j).png'; $output" | sed 's/tail -[1-9][0-9]*/tail -'$i'/' | gnuplot
-
-# co kdyz bude zadan pouze jeden prepinac, ktery urcuje animaci ?
-
-# efekt funguje pouze s ymax rovno max
-
-
+  #echo "=============="
   #echo "$columns"
   #echo "=============="
   #echo "$gnuplot"
@@ -922,8 +949,10 @@ function createAnim()
   #echo "$output"
   #echo "=============="
   #echo "$MULTIPLOT "
+  #echo "=============="
+  #echo "$fps"
+  #echo "=============="
   #return
-
 
   # start at the first multiple, end at the records
   local j=0
@@ -938,10 +967,7 @@ function createAnim()
       ef_output="$output"
     fi
 
-    #echo "set output '$directory/$(printf %0${#records}d $j).png'; $ef_output" | sed 's/head -[1-9][0-9]*/head -'$i'/g' >> vystup
-    #echo "set output '$directory/$(printf %0${#records}d $j).png'; $output" | sed 's/head -[1-9][0-9]*/head -'$i'/g' | gnuplot &>/dev/null
-    #echo "set output '$directory/$(printf %0${#records}d $j).png'; $output" | sed 's/head -[1-9][0-9]*/head -'$i'/g' | gnuplot
-    echo "set output '$directory/$(printf %0${#records}d $j).png'; $ef_output" | sed 's/head -[1-9][0-9]*/head -'$i'/g' | gnuplot
+    echo "set output '$directory/$(printf %0${#records}d $j).png'; $ef_output" | sed 's/head -[1-9][0-9]*/head -'$i'/g' | gnuplot &>/dev/null
 
     ((j++))
   done
@@ -976,8 +1002,8 @@ function cleanup()
 #-------------------------------------------------------------------------------
 # signal reactions
 #-------------------------------------------------------------------------------
-#trap cleanup EXIT
-#trap 'trap - EXIT; cleanup' INT TERM
+trap cleanup EXIT
+trap 'trap - EXIT; cleanup' INT TERM
 #-------------------------------------------------------------------------------
 # main
 #-------------------------------------------------------------------------------
@@ -1012,7 +1038,7 @@ function cleanup()
 #-------------------------------------------------------------------------------
   readParams "$@"
   shift `expr $OPTIND - 1`	# shift on the command line
-
+  
   verbose "processed switches: ${SWITCHES[@]}"         # report processed switches
 
   for i in "${SWITCHES[@]}"
@@ -1027,5 +1053,4 @@ function cleanup()
   checkValues               # check provided values of the switches or directives from the configuration file
 
   createAnim                # create the final animation
-
 
